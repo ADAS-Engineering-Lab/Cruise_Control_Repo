@@ -1,0 +1,32 @@
+
+name: Auto-Update Documentation & Reports
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * *"  # Runs every midnight
+
+jobs:
+  update-reports:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set Up MATLAB
+        uses: matlab-actions/setup-matlab@v1
+
+      - name: Run Simulink Model (if applicable)
+        run: |
+          matlab -batch "run('src/cruise_control_simulink.m')"
+
+      - name: Auto-Generate Performance Reports
+        run: python scripts/generate_reports.py
+
+      - name: Update Documentation
+        run: |
+          git add results/ README.md
+          git commit -m "📊 Auto-update documentation & results"
+          git push origin main
