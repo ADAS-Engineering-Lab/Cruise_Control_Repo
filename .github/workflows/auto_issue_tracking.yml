@@ -1,0 +1,42 @@
+name: Auto Task & Issue Management
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * *"  # Runs daily if enabled
+
+jobs:
+  check_repository:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if Automation is Enabled
+        run: |
+          if [ -f "automation/enable_automation.flag" ]; then
+            echo "✅ Automation is enabled for this repository!"
+          else
+            echo "❌ Automation is NOT enabled. Skipping workflow."
+            exit 0
+          fi
+
+  auto_issue_tracking:
+    needs: check_repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+
+      - name: Install Dependencies
+        run: pip install requests
+
+      - name: Auto-Generate Task List from README.md
+        run: python automation/generate_tasks.py
+
+      - name: Create GitHub Issues from Task List
+        run: python automation/create_issues.py
