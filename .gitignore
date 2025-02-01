@@ -1,1 +1,7 @@
-*.asv\n*.autosave\n*.log\n*.bak\n*.tmp\n*.swp\n.DS_Store
+
+# Ignore unnecessary files
+*.m~
+*.asv
+*.tmp
+*.log
+.DS_Store
